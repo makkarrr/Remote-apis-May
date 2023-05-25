@@ -1,5 +1,6 @@
 package com.example.clientdemo;
 
+import lombok.extern.log4j.Log4j2;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpMethod;
@@ -7,6 +8,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 
+@Log4j2
 public class MovieClient {
     //private static String url = "https://api.themoviedb.org/3/movie/%s?api_key=cd46fe13f1442cfa663d94a7d3ed7e5e";
 
@@ -24,9 +26,7 @@ public class MovieClient {
                 .queryParam("api_key", key) //?api_key=hjfbcvhjevbcksdc
                 .build()
                 .toUriString();
-
         //"https://moviedb.org/3/movie/530?api_key=hjfbcvhjevbcksdc"
-
 
         ResponseEntity<Movie> Response = restTemplate.exchange(url2, HttpMethod.GET, HttpEntity.EMPTY, Movie.class);
         return Response.getBody();
@@ -39,6 +39,8 @@ public class MovieClient {
         ResponseEntity response =  restTemplate.exchange(postUrl, HttpMethod.POST, entity, String.class);
         if( response.getStatusCode().is2xxSuccessful()) {
             return "movie added successfully";
+        } else if(response.getStatusCode().is5xxServerError()) {
+            log.warn("moviedb server error");
         }
         return "nothing";
     }
